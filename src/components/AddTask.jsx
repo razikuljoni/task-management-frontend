@@ -50,7 +50,6 @@ const AddTask = () => {
             });
             reset();
         } else {
-
             fetch(
                 `http://localhost:8000/users_data/${updateTaskId}?userId=${userId}`,
                 {
@@ -60,11 +59,17 @@ const AddTask = () => {
                 }
             );
             reset();
-            setUpdateTask(false)
+            setUpdateTask(false);
         }
     };
 
-
+    // Handle Complete Task
+    const handleCompleteTask = (id) => {
+        fetch(`http://localhost:8000/users_data/${id}?userId=${data[0]._id}&status=complete`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+        });
+    };
 
     // Handle Edit Task
     const handleEditTask = (id) => {
@@ -83,20 +88,20 @@ const AddTask = () => {
     };
 
     return (
-        <div className="w-full md:w-[500px] mx-auto">
+        <div className="w-full md:w-[500px] mx-auto mt-4">
             <section className="text-gray-600 body-font">
                 <form
                     onSubmit={handleSubmit(onSubmit)}
                     className="container px-5 pb-2 mx-auto flex flex-wrap items-center"
                 >
                     <div className=" bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0">
-                        <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
+                        <h2 className="text-gray-900 title-font mb-5 font-bold text-2xl">
                             Add A New Task
                         </h2>
                         <div className="relative mb-4">
                             <label
                                 htmlFor="full-name"
-                                className="leading-7 text-sm text-gray-600"
+                                className="leading-7 text-xl text-gray-600"
                             >
                                 Task
                             </label>
@@ -106,7 +111,6 @@ const AddTask = () => {
                                 type="text"
                                 id="full-name"
                                 placeholder="Task Name"
-                                
                                 {...register("task_name", { required: true })}
                                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                             />
@@ -114,12 +118,16 @@ const AddTask = () => {
                         <div className="relative mb-4">
                             <label
                                 htmlFor="description"
-                                className="leading-7 text-sm text-gray-600"
+                                className="leading-7 text-xl text-gray-600"
                             >
                                 Task Description
                             </label>
                             <textarea
-                                defaultValue={updateTask?.task_description}
+                                defaultValue={`${
+                                    updateTask
+                                        ? updateTask?.task_description
+                                        : ""
+                                }`}
                                 type="text"
                                 id="description"
                                 placeholder="Task Description"
@@ -134,20 +142,18 @@ const AddTask = () => {
                 </form>
             </section>
 
-            <>
-                {data[0]?.tasks.map((task, index) => {
+            <> 
+                {email && data[0]?.tasks.map((task, index) => {
                     return (
                         <div key={index} className="p-2 w-full">
                             <div className="bg-gray-100 rounded flex justify-between items-center p-4 h-full ">
-                                <div className="flex items-center">
-                                    <div className="">
-                                        <h2 className="title-font font-medium sm:text-2xl text-3xl text-gray-900">
-                                            Task: {task.task_name}
-                                        </h2>
-                                        <p className="leading-relaxed">
-                                            Description: {task.task_description}
-                                        </p>
-                                    </div>
+                                <div className="text-start">
+                                    <h2 className="title-font font-medium sm:text-2xl text-3xl text-gray-900">
+                                        Task: {task.status === "complete" ? <del>{task.task_name}</del> : task.task_name}
+                                    </h2>
+                                    <p className="leading-relaxed">
+                                        Description: {task.task_description}
+                                    </p>
                                 </div>
                                 <div className="text-gray-600 body-font">
                                     <div className="flex items-center justify-between">
@@ -156,7 +162,7 @@ const AddTask = () => {
                                                 className="bg-gray-300 p-2 rounded-full cursor-pointer"
                                                 title="mark as done"
                                                 onClick={() =>
-                                                    handleTaskDone(task?.id)
+                                                    handleCompleteTask(task?.id)
                                                 }
                                             >
                                                 <svg

@@ -1,15 +1,35 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AddTask from './components/AddTask.jsx';
-
+import App from "./App.jsx";
+import AddTask from "./components/AddTask.jsx";
+import Login from "./components/Login.jsx";
+import "./index.css";
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <AddTask/>,
+        element: (
+            <App>
+                <AddTask />{" "}
+            </App>
+        ),
+    },
+    {
+        path: "/login",
+        element: (
+            <App>
+                <Login />{" "}
+            </App>
+        ),
+    },
+    {
+        path: "/register",
+        element: (
+            <App>
+                <Login />{" "}
+            </App>
+        ),
     },
 ]);
 
