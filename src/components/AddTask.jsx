@@ -1,6 +1,26 @@
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
 const AddTask = () => {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [data, setData] = useState([]);
+    const auth = getAuth();
+    useEffect(() => {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setName(user?.auth?.currentUser?.displayName);
+                setEmail(user?.auth?.currentUser?.email);
+            } else {
+                // User is signed out
+                // ...
+            }
+        });
+
+        fetch("http://localhost:8000/users_data")
+            .then((res) => res.json())
+            .then((data) => setData(data));
+    }, [auth, data]);
     const {
         register,
         handleSubmit,
@@ -8,54 +28,144 @@ const AddTask = () => {
         formState: { errors },
     } = useForm();
 
-    const onSubmit = (data) => console.log(data);
+    const onSubmit = (data) => {
+        const task = {
+            user_name: name,
+            user_email: email,
+            task_name: data.task_name,
+            task_description: data.task_description,
+        };
+
+        //Post new task
+        fetch("http://localhost:8000/users_data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(task),
+        });
+    };
 
     return (
-        <div className="w-full md:w-96 mx-auto">
-            <form onSubmit={handleSubmit(onSubmit)} className="px-5 pt-7">
-                <label className="block pb-1 text-sm font-semibold text-gray-600 ">
-                    E-mail
-                </label>
-                <input
-                    type="text"
-                    {...register("task_name", { required: true })}
-                    placeholder="Please Enter Your Email"
-                    className="w-full px-3 py-2 mt-1 mb-5 text-sm border rounded-lg  
-                    "
-                    required
-                />
-                <p>{errors.task_name && <span>Task Name is required</span>}</p>
-                <label className="block pb-1 text-sm font-semibold text-gray-600 ">
-                    Task Description
-                </label>
-                <textarea
-                    type="text"
-                    {...register("task_description")}
-                    placeholder="Please Enter Your Password"
-                    className="w-full px-3 py-2 mt-1 mb-5 text-sm border rounded-lg"
-                    required
-                />
-                <button
-                    type="submit"
-                    className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
+        <div className="w-full md:w-[500px] mx-auto">
+            <section className="text-gray-600 body-font">
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="container px-5 pb-2 mx-auto flex flex-wrap items-center"
                 >
-                    <span className="inline-block mr-2">Add Task </span>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        className="inline-block w-4 h-4"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                    </svg>
-                </button>
-            </form>
+                    <div className=" bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0">
+                        <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
+                            Add A New Task
+                        </h2>
+                        <div className="relative mb-4">
+                            <label
+                                htmlFor="full-name"
+                                className="leading-7 text-sm text-gray-600"
+                            >
+                                Task
+                            </label>
+                            <input
+                                type="text"
+                                id="full-name"
+                                {...register("task_name", { required: true })}
+                                className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                            />
+                        </div>
+                        <div className="relative mb-4">
+                            <label
+                                htmlFor="description"
+                                className="leading-7 text-sm text-gray-600"
+                            >
+                                Task Description
+                            </label>
+                            <textarea
+                                type="text"
+                                id="description"
+                                {...register("task_description")}
+                                className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                            />
+                        </div>
+                        <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
+                            Add Task
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <div>
+                {data[0]?.tasks.map((task, index) => {
+                    return (
+                        <div key={index} className="p-2 w-full">
+                            <div className="bg-gray-100 rounded flex p-4 h-full items-center">
+                                <svg
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="3"
+                                    className="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
+                                    <path d="M22 4L12 14.01l-3-3"></path>
+                                </svg>
+                                <div className="flex flex-row justify-between p-2">
+                                    <span className="font-small"></span>
+                                    <section className="text-gray-600 body-font">
+                                        <div className="flex items-center justify-between">
+                                            <div className="">
+                                                <h2 className="title-font font-medium sm:text-2xl text-3xl text-gray-900">
+                                                    Task: {task.task_name}
+                                                </h2>
+                                                <p className="leading-relaxed">
+                                                    Description:{" "}
+                                                    {task.task_description}
+                                                </p>
+                                            </div>
+                                            <div className="flex">
+                                                <div>
+                                                    <svg
+                                                        data-darkreader-inline-stroke=""
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                        viewBox="0 0 24 24"
+                                                        className="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <svg
+                                                        data-darkreader-inline-stroke=""
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                        viewBox="0 0 24 24"
+                                                        className="text-indigo-500 w-6 h-6 flex-shrink-0 mr-4"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                                                        ></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </div>
     );
 };
