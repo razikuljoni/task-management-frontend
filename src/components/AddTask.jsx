@@ -5,6 +5,10 @@ const AddTask = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [data, setData] = useState([]);
+    const [updateTask, setUpdateTask] = useState(false);
+    const [updateTaskId, setUpdateTaskId] = useState("");
+    const [userId, setUserId] = useState("");
+
     const auth = getAuth();
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -20,11 +24,12 @@ const AddTask = () => {
         fetch("http://localhost:8000/users_data")
             .then((res) => res.json())
             .then((data) => setData(data));
+        setUserId(data[0]?._id);
     }, [auth, data]);
     const {
         register,
         handleSubmit,
-        watch,
+        reset,
         formState: { errors },
     } = useForm();
 
@@ -36,15 +41,38 @@ const AddTask = () => {
             task_description: data.task_description,
         };
 
-        //Post new task
-        fetch("http://localhost:8000/users_data", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(task),
-        });
+        if (!updateTask) {
+            //Post new task
+            fetch("http://localhost:8000/users_data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(task),
+            });
+            reset();
+        } else {
+
+            fetch(
+                `http://localhost:8000/users_data/${updateTaskId}?userId=${userId}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(task),
+                }
+            );
+            reset();
+            setUpdateTask(false)
+        }
     };
 
 
+
+    // Handle Edit Task
+    const handleEditTask = (id) => {
+        fetch(`http://localhost:8000/users_data/${id}?userId=${data[0]._id}`)
+            .then((res) => res.json())
+            .then((data) => setUpdateTask(data));
+        setUpdateTaskId(id);
+    };
 
     // Handle Delete Task
     const handleDeleteTask = (id) => {
@@ -73,8 +101,12 @@ const AddTask = () => {
                                 Task
                             </label>
                             <input
+                                onClick={(e) => e.target.value}
+                                defaultValue={updateTask?.task_name}
                                 type="text"
                                 id="full-name"
+                                placeholder="Task Name"
+                                
                                 {...register("task_name", { required: true })}
                                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                             />
@@ -87,14 +119,16 @@ const AddTask = () => {
                                 Task Description
                             </label>
                             <textarea
+                                defaultValue={updateTask?.task_description}
                                 type="text"
                                 id="description"
+                                placeholder="Task Description"
                                 {...register("task_description")}
                                 className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                             />
                         </div>
                         <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-                            Add Task
+                            {updateTask ? "Update Task" : "Add Task"}
                         </button>
                     </div>
                 </form>
@@ -121,7 +155,9 @@ const AddTask = () => {
                                             <div
                                                 className="bg-gray-300 p-2 rounded-full cursor-pointer"
                                                 title="mark as done"
-                                                onClick={() => handleTaskDone}
+                                                onClick={() =>
+                                                    handleTaskDone(task?.id)
+                                                }
                                             >
                                                 <svg
                                                     fill="none"
