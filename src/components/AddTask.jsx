@@ -145,6 +145,7 @@ const AddTask = () => {
             <> 
                 {email && data[0]?.tasks.map((task, index) => {
                     return (
+                        task?.status !== "complete" &&
                         <div key={index} className="p-2 w-full">
                             <div className="bg-gray-100 rounded flex justify-between items-center p-4 h-full ">
                                 <div className="text-start">

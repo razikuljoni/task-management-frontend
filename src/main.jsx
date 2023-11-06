@@ -6,6 +6,7 @@ import AddTask from "./components/AddTask.jsx";
 import Login from "./components/Login.jsx";
 import "./index.css";
 import Register from "./components/Register.jsx";
+import CompleteTasks from "./components/CompleteTasks.jsx";
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,14 @@ const router = createBrowserRouter([
         element: (
             <App>
                 <Register />{" "}
+            </App>
+        ),
+    },
+    {
+        path: "/complete-tasks",
+        element: (
+            <App>
+                <CompleteTasks />{" "}
             </App>
         ),
     },
