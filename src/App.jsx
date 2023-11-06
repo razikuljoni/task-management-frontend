@@ -1,22 +1,27 @@
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom/dist";
+import { Link, useNavigate } from "react-router-dom/dist";
 import Swal from "sweetalert2";
 import "./App.css";
-import { useNavigate } from "react-router-dom/dist";
 
 // eslint-disable-next-line react/prop-types
 function App({ children }) {
     const [user, setUser] = useState();
     const auth = getAuth();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUser(user?.auth?.currentUser);
             } else {
-                // User is signed out
-                // ...
+                Swal.fire({
+                    position: "center-center",
+                    icon: "info",
+                    title: "Please Login to save your Data.",
+                    showConfirmButton: false,
+                    showCloseButton: true,
+                    timer: 3000,
+                });
             }
         });
     }, [auth]);
@@ -24,8 +29,8 @@ function App({ children }) {
     const handleSignOut = (e) => {
         e.preventDefault();
 
-        if(!user){
-          return navigate("/login");
+        if (!user) {
+            return navigate("/login");
         }
 
         signOut(auth)

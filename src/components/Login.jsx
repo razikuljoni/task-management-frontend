@@ -4,6 +4,7 @@ import {
     GoogleAuthProvider,
     getAuth,
     onAuthStateChanged,
+    signInWithEmailAndPassword,
     signInWithPopup,
 } from "firebase/auth";
 import { useEffect } from "react";
@@ -31,35 +32,38 @@ const Login = () => {
         });
     }, [auth]);
 
-    document.title = "Melody Institute | Login";
-
-    const from = location.state?.from?.pathname || "/home";
-
     const handleUserLogin = (e) => {
         e.preventDefault();
 
         const email = e.target.email.value;
         const password = e.target.password.value;
-        // if (password.length < 6) {
-        //     showErrorMessage("Password must be at least 6 characters");
-        //     return setError("Password must be at least 6 characters");
-        // } else {
-        //     emailPasswordUserLogin(email, password)
-        //         .then(() => {
-        //             setError("");
-        //             showSuccessMessage("👍 Email SignIn Successful!");
-        //             navigate(from, { replace: true });
-        //         })
-        //         .catch((err) => {
-        //             setError(err.message);
-        //             showErrorMessage(err.message);
-        //         });
-        // }
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in
+                const user = userCredential.user;
+                navigate("/");
+                Swal.fire({
+                    icon: "success",
+                    title: "Login Successfull!",
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+            })
+            .catch((error) => {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "error",
+                    title: error.message,
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+            });
     };
 
     const handleGoogleLogin = () => {
         signInWithPopup(auth, googleProvider)
             .then(() => {
+                navigate("/");
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -82,6 +86,7 @@ const Login = () => {
     const handleGithubLogin = () => {
         signInWithPopup(auth, githubProvider)
             .then(() => {
+                navigate("/");
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -104,6 +109,7 @@ const Login = () => {
     const handleFacebookLogin = () => {
         signInWithPopup(auth, facebookProvider)
             .then(() => {
+                navigate("/");
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -148,7 +154,7 @@ const Login = () => {
                             type="password"
                             name="password"
                             placeholder="Please Enter Your Password"
-                            className="w-full px-3 py-2 mt-1 mb-5 text-sm border rounded-lg dark:text-white "
+                            className="w-full px-3 py-2 mt-1 mb-5 text-sm border rounded-lg  "
                             required
                         />
                         {/* {error && (
@@ -160,7 +166,9 @@ const Login = () => {
                             type="submit"
                             className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
                         >
-                            <span className="inline-block mr-2">Login</span>
+                            <span className="inline-block mr-2 text-white">
+                                Login
+                            </span>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"

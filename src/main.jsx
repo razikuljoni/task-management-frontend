@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import AddTask from "./components/AddTask.jsx";
 import Login from "./components/Login.jsx";
 import "./index.css";
+import Register from "./components/Register.jsx";
 
 const router = createBrowserRouter([
     {
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
         path: "/register",
         element: (
             <App>
-                <Login />{" "}
+                <Register />{" "}
             </App>
         ),
     },
