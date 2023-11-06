@@ -15,7 +15,6 @@ function App({ children }) {
                 setUser(user?.auth?.currentUser);
             } else {
                 Swal.fire({
-                    position: "center-center",
                     icon: "info",
                     title: "Please Login to save your Data.",
                     showConfirmButton: false,
@@ -105,7 +104,8 @@ function App({ children }) {
                             </svg>
                         </button>
                     </nav>
-                    <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
+                    <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"
+                    onClick={handleSignOut}>
                         {user ? "LogOut" : <Link to="/login">Login</Link>}
                         <svg
                             fill="none"

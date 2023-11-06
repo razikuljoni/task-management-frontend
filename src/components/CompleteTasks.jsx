@@ -1,6 +1,5 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import app from "../configs/firebase.config";
 
 const CompleteTasks = () => {
@@ -13,14 +12,7 @@ const CompleteTasks = () => {
             if (user) {
                 setUser(user?.auth?.currentUser);
             } else {
-                Swal.fire({
-                    position: "center-center",
-                    icon: "info",
-                    title: "Please Login to save your Data.",
-                    showConfirmButton: false,
-                    showCloseButton: true,
-                    timer: 3000,
-                });
+                console.log("User is signed out");
             }
         });
 
@@ -98,7 +90,14 @@ const CompleteTasks = () => {
                 ) : (
                     <div>
                         <h2 className="title-font text-center font-medium sm:text-2xl text-3xl text-gray-900">
-                            No Task Found. Please Login First.
+                            Please Login First.
+                        </h2>
+                    </div>
+                )}
+                {user && data[0]?.tasks.length === 0 && (
+                    <div>
+                        <h2 className="title-font text-center font-medium sm:text-2xl text-3xl text-gray-900">
+                            No Completed Task
                         </h2>
                     </div>
                 )}

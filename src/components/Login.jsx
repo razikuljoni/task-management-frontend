@@ -24,7 +24,7 @@ const Login = () => {
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log(user?.auth?.currentUser?.email);
+                navigate("/");
             } else {
                 // User is signed out
                 // ...
