@@ -16,16 +16,19 @@ const CompleteTasks = () => {
             }
         });
 
-        fetch("http://localhost:8000/users_data")
+        fetch("https://task-management-rust-two.vercel.app/users_data")
             .then((res) => res.json())
             .then((data) => setData(data));
     }, [auth, data]);
 
     const handleDeleteTask = (id) => {
-        fetch(`http://localhost:8000/users_data/${id}?userId=${data[0]._id}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-        });
+        fetch(
+            `https://task-management-rust-two.vercel.app/users_data/${id}?userId=${data[0]._id}`,
+            {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+            }
+        );
     };
 
     return (
